@@ -18,4 +18,4 @@ const postsRouter = require('./routes/posts');
 app.use('/posts', postsRouter);
 
 // Start Express Application
-app.listen(8000, () => console.log('server started!'));
+app.listen(8000, () => console.log('blog server started!'));
