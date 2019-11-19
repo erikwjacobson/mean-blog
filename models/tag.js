@@ -19,7 +19,6 @@ const tagSchema = new mongoose.Schema({
         required: true,
         default: Date.now
     },
-    created_by: mongoose.Schema.Types.ObjectId
 })
 
 module.exports = mongoose.model('Tag', tagSchema)

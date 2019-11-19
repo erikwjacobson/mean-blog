@@ -9,7 +9,7 @@ router.get('/', async (req,res) => {
         const posts = await Post.find();
         res.json(posts);
     } catch(err) {
-        res.status(500).json({ message:err.message });
+        res.status(500).json({ message: err.message });
     }
 })
 
@@ -41,9 +41,9 @@ router.post('/', async (req,res) => {
 // Update a post
 router.patch('/:id', PostMiddleware.getPost, async (req,res) => {
     // Fill fields
-    var attributes = Post.fillable()
+    var attributes = Post.fillable() // Only fill fillable fields
     for(var attr in attributes) {
-        if(req.body[attr] != null) {
+        if(req.body[attr] != null) { // Fill all of the fields submitted
             res.post[attr] = req.body[attr]
         }
     }

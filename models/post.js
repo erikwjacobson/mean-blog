@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 
+/**
+ * Posts Schema
+ */
 const postSchema = new mongoose.Schema({
     title: {
         type: String,
@@ -25,11 +28,15 @@ const postSchema = new mongoose.Schema({
         required: true,
         default: Date.now
     },
-    // created_by: mongoose.Schema.Types.ObjectId,
+    tags: [mongoose.Schema.Types.ObjectId], // TODO Determine if this should be done by reference or nesting.
+    categories: [mongoose.Schema.Types.ObjectId], // TODO Determine if this should be done by reference or nesting.
+    created_by: mongoose.Schema.Types.ObjectId,
+    meta: {
+        views: Number
+    },
 });
 
 // Statics
-
 /**
  * Returns all of the paths that are fillable through front-end requests
  */
@@ -38,6 +45,5 @@ postSchema.statics.fillable = function() {
     var { _id, __v, created_at, updated_at, ...attrs } = this.schema.paths
     return attrs;
 }
-
 
 module.exports = mongoose.model('Post', postSchema);
