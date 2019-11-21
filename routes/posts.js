@@ -21,15 +21,18 @@ router.get('/:id', PostMiddleware.getPost, (req,res) => {
 // Create a post
 router.post('/', async (req,res) => {
     // Create a new post
-    const post = new Post();
+    var post = new Post();
+    const user = req.body.user
 
     // Fill fields
-    var attributes = Post.fillable()
     for(var attr in attributes) {
-        if(req.body[attr] != null) {
-            post[attr] = req.body[attr]
+        if(req.body[attr] != null) { // Fill all of the fields submitted
+            res.post[attr] = req.body[attr]
         }
     }
+    
+    // Associate with user
+    post.created_by = user.id
     try {
         const newPost = await post.save();
         res.status(201).json(newPost);
