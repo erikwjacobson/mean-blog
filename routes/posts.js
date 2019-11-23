@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const Post = require('../models/post');
+const Category = require('../models/category');
 const PostMiddleware = require('../middleware/posts');
 
-// Get all posts
+/**
+ * Returns all of the post resources
+ */
 router.get('/', async (req,res) => {
     try {
         const posts = await Post.find();
@@ -13,36 +16,67 @@ router.get('/', async (req,res) => {
     }
 })
 
-// Get a specific post
+/**
+ * Returns a specific post resource based on id
+ */
 router.get('/:id', PostMiddleware.getPost, (req,res) => {
     res.json(res.post)
 })
 
-// Create a post
+/**
+ * Creates a new post resource
+ * 
+ * Expects Attributes:
+ *  
+ */
 router.post('/', async (req,res) => {
     // Create a new post
     var post = new Post();
-    const user = req.body.user
+
+    // Fetch the user from the request
+    var user = req.body.user
 
     // Fill fields
-    for(var attr in attributes) {
+    var attributes = Post.fillable()
+    for(var attr in attributes) { 
         if(req.body[attr] != null) { // Fill all of the fields submitted
-            res.post[attr] = req.body[attr]
+            post[attr] = req.body[attr]
+        }
+    }
+
+    // // Handle categories
+    if(req.body.categories) {
+        for(category in req.body.categories) {
+            post.categories.push(category)
         }
     }
     
+    // Handle Tags
+    if(req.body.tags) {
+        for(var tag in req.body.tags) {
+            post.tags.push({tag_name: req.body.tags[tag]})
+        }
+    }
+    
+    
     // Associate with user
-    post.created_by = user.id
+    post.created_by = user._id
+
     try {
-        const newPost = await post.save();
+        var newPost = await post.save();
         res.status(201).json(newPost);
     } catch(err) {
         res.status(400).json({message:err.message})
     }
 })
 
-// Update a post
-router.patch('/:id', PostMiddleware.getPost, async (req,res) => {
+/**
+ * Updates a specific post resource based on id
+ * 
+ * Authorization Required
+ * 
+ */
+router.patch('/:id', [PostMiddleware.getPost, PostMiddleware.authorize] , async (req,res) => {
     // Fill fields
     var attributes = Post.fillable() // Only fill fillable fields
     for(var attr in attributes) {
@@ -59,7 +93,12 @@ router.patch('/:id', PostMiddleware.getPost, async (req,res) => {
     }
 })
 
-// Delete a post
+/**
+ * Deletes a specific post resource based on id
+ * 
+ * Authorization Required
+ * 
+ */
 router.delete('/:id', PostMiddleware.getPost, async (req,res) => {
     try {
         await res.post.remove()

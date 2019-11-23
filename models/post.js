@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+var categorySchema = require('./category')
 
 /**
  * Posts Schema
@@ -28,21 +29,28 @@ const postSchema = new mongoose.Schema({
         required: true,
         default: Date.now
     },
-    tags: [mongoose.Schema.Types.ObjectId], // TODO Determine if this should be done by reference or nesting.
-    categories: [mongoose.Schema.Types.ObjectId], // TODO Determine if this should be done by reference or nesting.
-    created_by: mongoose.Schema.Types.ObjectId,
+    created_by: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
+    tags: [{
+        tag_name: {
+            type: String,
+        },
+    }],
+    categories: [categorySchema.schema],
     meta: {
         views: Number
     },
 });
 
-// Statics
+
 /**
  * Returns all of the paths that are fillable through front-end requests
  */
 postSchema.statics.fillable = function() {
     // Define excluded attributes
-    var { _id, __v, created_at, updated_at, ...attrs } = this.schema.paths
+    var { _id, __v, created_at, updated_at, tags, categories, ...attrs } = this.schema.paths
     return attrs;
 }
 
